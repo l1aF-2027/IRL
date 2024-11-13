@@ -16,6 +16,7 @@ from PlotUtils import *
 from Eval import *
 from rlpyt.samplers.serial.sampler import SerialSampler
 from rlpyt.samplers.parallel.gpu.sampler import GpuSampler
+from datetime import datetime
 
 def findSamplesInTrajs (stateSamples, trajs) : 
     """ 
@@ -117,13 +118,41 @@ def irl (rewardFnSpace) :
         rewardFnSpace.refine(expertValues, inferiorValues)
     return agent, rewardFn
 
-if __name__ == "__main__" :
-    agent, rewardFn = irl(RewardFnSpace(acrobotRewardBases(np.pi / 2, np.pi / 2)))
-    xRange = np.arange(-np.pi, np.pi, 0.1)
-    yRange = np.arange(-np.pi, np.pi, 0.1)
-    toExternal = lambda x, y : toExternalStateRep([x, y, 0, 0])
-    RFn = compose(rewardFn, toExternal)
-    plotFunction(RFn, xRange, yRange, 'theta1', 'theta2', 'R')
-    plt.savefig('recovered.png')
-    plt.show()
-    simulateAgent(agent, render=True)
+if __name__ == "__main__":
+   
+   # Tạo thư mục results trong cùng thư mục với file code
+   current_dir = osp.dirname(osp.abspath(__file__)) 
+   save_dir = osp.join(current_dir, 'results')
+   os.makedirs(save_dir, exist_ok=True)
+
+   # Chạy thuật toán IRL
+   agent, rewardFn = irl(RewardFnSpace(acrobotRewardBases(np.pi / 2, np.pi / 2)))
+   
+   # Tạo dữ liệu để vẽ
+   xRange = np.arange(-np.pi, np.pi, 0.1)
+   yRange = np.arange(-np.pi, np.pi, 0.1)
+   toExternal = lambda x, y : toExternalStateRep([x, y, 0, 0])
+   RFn = compose(rewardFn, toExternal)
+   
+   # Vẽ đồ thị
+   plotFunction(RFn, xRange, yRange, 'theta1', 'theta2', 'R')
+   
+   # Tạo tên file với timestamp
+   timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+   filename = f'recovered_{timestamp}.png'
+   save_path = osp.join(save_dir, filename)
+   
+   # Lưu hình với chất lượng cao
+   plt.savefig(save_path, 
+               dpi=300,           # độ phân giải cao
+               bbox_inches='tight',  # cắt bỏ viền trắng thừa
+               pad_inches=0.1,    # thêm padding nhỏ
+               format='png')      # định dạng file
+   
+   # Hiển thị đồ thị
+   plt.show()
+   
+   # Chạy mô phỏng
+   simulateAgent(agent, render=True)
+
+# pip install gym==0.25.2 functional pulp pyprind 
