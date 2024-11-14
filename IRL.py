@@ -156,3 +156,4 @@ if __name__ == "__main__":
    simulateAgent(agent, render=True)
 
 # pip install gym==0.25.2 functional pulp pyprind 
+# pip install pygame --pre
