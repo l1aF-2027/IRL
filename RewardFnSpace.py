@@ -76,7 +76,17 @@ class RewardFnSpace () :
                              for y1, y2 in zip(self.y1s, self.y2s)])
         self.lp += self.l1Term
         self.coeffs = [self.rng.rand() for _ in self.rewardBases]
+    def get_coefficients(self):
+        """
+        Retrieve the coefficients (alphas) of the reward bases.
+        """
+        return [value(a) for a in self.alphas]
 
+    def get_basis_names(self):
+        """
+        Retrieve names or descriptions of the reward bases.
+        """
+        return [getattr(rfn, '__name__', f"f{i}") for i, rfn in enumerate(self.rewardBases)]
     def _estimatedValueExpressions (self, stateValuesForBases) :
         svfb = np.array(stateValuesForBases)
         alphas = np.array(self.alphas)
